@@ -1,0 +1,91 @@
+Dim month As Range
+Dim avg As Double
+Dim monthavg As Double
+Dim count As Integer
+Dim temp
+Dim ws As Worksheet
+
+
+
+Sub mon_rep()
+
+'Check for REPORT sheet name
+For Each ws In ActiveWorkbook.Worksheets
+  
+  If ws.Name = "REPORT" Then
+    stat = 1
+  End If
+  
+Next ws
+'if no REPORT sheet name found then create a REPORT sheet
+If stat = 0 Then
+  Sheets.Add after:=ActiveSheet
+  ActiveSheet.Name = "REPORT"
+End If
+
+'Adding Title to the REPORT Sheet
+Range("A1").Value = "Monthly Average Solar Irradiance Report"
+'Adding month field to the REPORT sheet
+Range("A2").Value = "Month"
+'Listing month names by inbuilt month name function
+For i = 1 To 12
+ Range("A1").Offset(i + 1, 0).Value = MonthName(i)
+Next
+
+'Select the DATA sheets
+Sheets("DATA").Select
+'Copy paste the field names
+Range("F3:K3").Select
+Selection.Copy
+Sheets("REPORT").Select
+Range("B2").Select
+ActiveSheet.Paste
+CutCopyMode = False
+Sheets("DATA").Select
+'Seting range of month for looping
+Set month = ActiveWorkbook.Sheets("DATA").Range("B4", Range("B4").End(xlDown))
+'Calling calc function to calculate the monthly average calc("DATA-Field","REPORT-Destination")
+calc 4, 1
+calc 5, 2
+calc 6, 3
+calc 7, 4
+calc 8, 5
+calc 9, 6
+
+'Selct
+Sheets("REPORT").Select
+Columns("A:G").Select
+Selection.EntireColumn.AutoFit
+CutCopyMode = False
+
+End Sub
+
+
+Sub calc(field, insert)
+
+For Each Data In month.Cells
+    
+    If (Data.Value <= 12) And (Data.Offset(, 1).Value <= 31) And (Data.Offset(, 2).Value <= 23) Then
+    
+     If Data.Value = temp Then
+        monthavg = avg / count
+        ActiveWorkbook.Sheets("REPORT").Range("A1").Offset(temp, insert).Value = monthavg
+        avg = 0
+        count = 0
+     End If
+
+     avg = avg + Data.Offset(, field).Value
+     count = count + 1
+     temp = Data.Value + 1
+     
+     If Data.Value = 12 And count = 744 Then
+        monthavg = avg / count
+        ActiveWorkbook.Sheets("REPORT").Range("A2").Offset((temp - 1), insert).Value = monthavg
+        avg = 0
+        count = 0
+     End If
+     
+     End If
+Next Data
+
+End Sub

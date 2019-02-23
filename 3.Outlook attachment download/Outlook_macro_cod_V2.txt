@@ -1,0 +1,90 @@
+
+Dim nsp As Outlook.NameSpace
+ 
+ Dim mpf As Outlook.Folder
+ 
+ Dim email As Object
+ 
+ Dim attmt As Object
+ 
+ Dim idx As Integer
+ 
+ Dim filename As String
+ 
+ 
+ Sub Attach_download()
+
+ idx = 0
+
+ 
+ gotodwnld "COMERCIAL NB", "ChromiaH15", "C:\Work\Models\COMERCIAL NOTEBOOKS\ChromiaH15\2019\PM\"
+ gotodwnld "COMERCIAL NB", "Circus15", "C:\Work\Models\COMERCIAL NOTEBOOKS\Circus15H\2019\PM\"
+ gotodwnld "COMERCIAL NB", "Jaguars6U", "C:\Work\Models\COMERCIAL NOTEBOOKS\ChromiaH15\2019\PM\"
+ gotodwnld "COMERCIAL NB", "Tetris", "C:\Work\Models\COMERCIAL NOTEBOOKS\Tetris\PM\"
+ gotodwnld "COMERCIAL NB", "Tracks14", "C:\Work\Models\COMERCIAL NOTEBOOKS\Tracks14\PM\"
+ 
+ MsgBox ("Downloaded COMERCIAL NB : " & idx & " File")
+
+idx = 0
+
+gotodwnld "CONSUMER NB", "DUMBLEDOR", "C:\Work\Models\CONSUMER NOTEBOOKS\Dumbledor\PM\"
+gotodwnld "CONSUMER NB", "Falafel", "C:\Work\Models\CONSUMER NOTEBOOKS\Falafel\PM\"
+gotodwnld "CONSUMER NB", "Gale", "C:\Work\Models\CONSUMER NOTEBOOKS\Gale\PM\"
+gotodwnld "CONSUMER NB", "Gamora", "C:\Work\Models\CONSUMER NOTEBOOKS\Gamora\PM\"
+gotodwnld "CONSUMER NB", "Nightfury", "C:\Work\Models\CONSUMER NOTEBOOKS\Nightfury\PM\"
+gotodwnld "CONSUMER NB", "Okinawa", "C:\Work\Models\CONSUMER NOTEBOOKS\Okinawa\PM\"
+gotodwnld "CONSUMER NB", "Tortilla", "C:\Work\Models\CONSUMER NOTEBOOKS\Tortilla\PM\"
+gotodwnld "CONSUMER NB", "Tully", "C:\Work\Models\CONSUMER NOTEBOOKS\Tully\PM"
+ 
+ MsgBox ("Downloaded CONSUMER NB : " & idx & " File")
+ 
+ idx = 0
+gotodwnld "CONSUMER DT", "AdlerI", "C:\Work\Models\CONSUMER DESKTOP\AdlerI\PM\"
+gotodwnld "CONSUMER DT", "Dyson", "C:\Work\Models\CONSUMER DESKTOP\Dyson\PM\"
+gotodwnld "CONSUMER DT", "Eastman", "C:\Work\Models\CONSUMER DESKTOP\EASTMAN\PM\"
+gotodwnld "CONSUMER DT", "Hurricane-I", "C:\Work\Models\CONSUMER DESKTOP\Hurricane-I\PM\"
+gotodwnld "CONSUMER DT", "Schumi27", "C:\Work\Models\CONSUMER DESKTOP\Schumi27_3\PM\"
+gotodwnld "CONSUMER DT", "TracerI", "C:\Work\Models\CONSUMER DESKTOP\TracerI\PM\"
+
+MsgBox ("Downloaded CONSUMER DT : " & idx & " File")
+ 
+ 
+ 
+ 
+End Sub
+
+
+Sub gotodwnld(vertical As String, model As String, fpath As String)
+
+
+
+ Set myNameSpace = Application.GetNamespace("MAPI")
+ 
+ Set mpf = myNameSpace.GetDefaultFolder(olFolderInbox).Parent.Folders(vertical).Folders(model)
+                        
+ 
+ If mpf.items.Restrict("[UnRead] = True").count = 0 Then
+        MsgBox "NO Unread Email In " & model
+        Exit Sub
+    End If
+
+    '~~> Extract the attachment from the 1st unread email
+    For Each email In mpf.items.Restrict("[UnRead] = True")
+        '~~> Check if the email actually has an attachment
+        If email.Attachments.count <> 0 Then
+            For Each attmt In email.Attachments
+                If Right(attmt.filename, 3) = "zip" Or Right(attmt.filename, 3) = "xls" Or Right(attmt.filename, 3) = "lsx" Then
+                        '~~> Download the attachment
+                        filename = fpath & attmt.filename
+                        attmt.SaveAsFile filename
+                        idx = idx + 1
+                End If
+             Exit For
+         Next
+        End If
+    
+    Next
+ 
+
+
+End Sub

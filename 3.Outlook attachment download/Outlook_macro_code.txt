@@ -1,0 +1,47 @@
+Sub Attach_download()
+
+Dim nsp As Outlook.NameSpace
+ 
+ Dim mpf As Outlook.Folder
+ 
+ Dim email As Object
+ 
+ Dim attmt As Object
+ 
+ Dim idx As Integer
+ 
+ Dim filename As String
+ 
+ idx = 0
+ 
+ 
+ Set myNameSpace = Application.GetNamespace("MAPI")
+ 
+ Set mpf = myNameSpace.GetDefaultFolder(olFolderInbox).Parent.Folders("CONSUMER DT").Folders("AdlerI")
+                        
+ 
+ If mpf.items.Restrict("[UnRead] = True").count = 0 Then
+        MsgBox "NO Unread Email In Inbox"
+        Exit Sub
+    End If
+
+    '~~> Extract the attachment from the 1st unread email
+    For Each email In mpf.items.Restrict("[UnRead] = True")
+        '~~> Check if the email actually has an attachment
+        If email.Attachments.count <> 0 Then
+            For Each attmt In email.Attachments
+                If Right(attmt.filename, 3) = "zip" Or Right(attmt.filename, 3) = "xls" Or Right(attmt.filename, 3) = "lsx" Then
+                        '~~> Download the attachment
+                        filename = "C:\VBA\Macro Codes\" & attmt.filename
+                        attmt.SaveAsFile filename
+                        idx = idx + 1
+                End If
+             Exit For
+         Next
+        End If
+    
+    Next
+ 
+ MsgBox ("Downloaded : " & idx & " File")
+ 
+End Sub
